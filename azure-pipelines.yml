@@ -5,6 +5,7 @@ variables:
   webRepository: 'web'
   tag: '$(Build.BuildId)'
   acrName: 'tailspinspacegameqq'
+  acrLoginServer: 'tailspinspacegameqq.azurecr.io'
   dockerRegistryServiceConnection: 'Container Registry Connection'
 
 stages:
@@ -23,7 +24,7 @@ stages:
       inputs:
         command: buildAndPush
         containerRegistry: '$(dockerRegistryServiceConnection)'
-        repository: '$(webRepository)'
+        repository: '$(acrLoginServer)/$(webRepository)'
         dockerfile: '$(Build.SourcesDirectory)/Tailspin.SpaceGame.Web/Dockerfile'
         buildContext: '$(Build.SourcesDirectory)/Tailspin.SpaceGame.Web'
         tags: |
@@ -45,4 +46,4 @@ stages:
       inputs:
         azureSubscription: 'Resource Manager - Tailspin - Space Game'
         appName: '$(WebAppName)'
-        containers: '$(acrName)/$(webRepository):$(tag)'
+        containers: '$(acrLoginServer)/$(webRepository):$(tag)'
