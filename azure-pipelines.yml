@@ -18,10 +18,10 @@ stages:
       displayName: 'Build and push image to ACR'
       inputs:
         command: buildAndPush
-        containerRegistry: 'Container Registry Connection'  # Make sure this exactly matches the service connection name
+        containerRegistry: 'Container Registry Connection'  # Must match your service connection name
         repository: '$(webRepository)'
         dockerfile: '$(Build.SourcesDirectory)/Tailspin.SpaceGame.Web/Dockerfile'
-        buildContext: '$(Build.Repository.LocalPath)'
+        buildContext: '$(Build.SourcesDirectory)/Tailspin.SpaceGame.Web'
         tags: |
           $(tag)
 
@@ -34,11 +34,11 @@ stages:
     pool:
       vmImage: 'ubuntu-20.04'
     variables:
-    - group: Release  # This should include WebAppName and RegistryName
+    - group: Release  # Make sure WebAppName and RegistryName exist in this group
     steps:
     - task: AzureWebAppContainer@1
       displayName: 'Deploy container to App Service'
       inputs:
-        azureSubscription: 'Resource Manager - Tailspin - Space Game'  # Must exactly match your service connection
+        azureSubscription: 'Resource Manager - Tailspin - Space Game'  # Must match Azure service connection
         appName: '$(WebAppName)'
         containers: '$(RegistryName)/$(webRepository):$(tag)'
