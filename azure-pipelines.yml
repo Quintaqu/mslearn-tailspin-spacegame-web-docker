@@ -4,12 +4,14 @@ trigger:
 variables:
   webRepository: 'web'
   tag: '$(Build.BuildId)'
+  acrName: 'tailspinspacegameqq'
+  dockerRegistryServiceConnection: 'Container Registry Connection'
 
 stages:
-- stage: 'Build'
+- stage: Build
   displayName: 'Build and push Docker image'
   jobs: 
-  - job: 'Build'
+  - job: Build
     displayName: 'Build Docker container'
     pool:
       vmImage: 'ubuntu-20.04'
@@ -20,18 +22,18 @@ stages:
       displayName: 'Build and push image to ACR'
       inputs:
         command: buildAndPush
-        containerRegistry: 'Container Registry Connection'   # matched from screenshot
+        containerRegistry: '$(dockerRegistryServiceConnection)'
         repository: '$(webRepository)'
         dockerfile: '$(Build.SourcesDirectory)/Tailspin.SpaceGame.Web/Dockerfile'
         buildContext: '$(Build.SourcesDirectory)/Tailspin.SpaceGame.Web'
         tags: |
           $(tag)
 
-- stage: 'Deploy'
+- stage: Deploy
   displayName: 'Deploy the container to App Service'
   dependsOn: Build
   jobs:
-  - job: 'Deploy'
+  - job: Deploy
     displayName: 'Deploy job'
     pool:
       vmImage: 'ubuntu-20.04'
@@ -41,6 +43,6 @@ stages:
     - task: AzureWebAppContainer@1
       displayName: 'Deploy container to App Service'
       inputs:
-        azureSubscription: 'Resource Manager - Tailspin - Space Game'  # matched from screenshot
+        azureSubscription: 'Resource Manager - Tailspin - Space Game'
         appName: '$(WebAppName)'
-        containers: '$(RegistryName)/$(webRepository):$(tag)'
+        containers: '$(acrName)/$(webRepository):$(tag)'
